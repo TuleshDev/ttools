@@ -12,7 +12,7 @@ class BaseTools:
         i = 0
         p = -1
         while i == 0 or p != -1:
-            p = dir.find('\\', p + 1)
+            p = dir.find(os.sep, p + 1)
             if p != -1:
                 dir2 = dir[:p + 1]
             else:
@@ -46,8 +46,11 @@ class BaseTools:
         p = secondPath.find(':', 0)
         if p == -1:
             p = secondPath.find('./', 0)
+            p2 = secondPath.find('/', 0)
             if p == 0:
                 secondPath = secondPath[2:]
+            elif p2 == 0:
+                secondPath = secondPath[1:]
             else:
                 p = 0
                 while p == 0:
