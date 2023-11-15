@@ -9,6 +9,7 @@ class BaseTools:
 
     @staticmethod
     def createFolder(dir):
+        dir = dir.replace('/', os.sep)
         i = 0
         p = -1
         while i == 0 or p != -1:
