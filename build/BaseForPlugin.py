@@ -48,10 +48,10 @@ class BaseForPlugin(parent):
         for param in params:
             if i >= 6:
                 line = param
-                commands[i - 6] = line[:line.find(',', 0)]
+                commands.append(line[:line.find(',', 0)])
                 line = line[line.find(',', 0) + 1:len(line)]
-                commandsArgument1[i - 6] = line[:line.find(',', 0)]
-                commandsArgument2[i - 6] = line[line.find(',', 0) + 1:len(line)]
+                commandsArgument1.append(line[:line.find(',', 0)])
+                commandsArgument2.append(line[line.find(',', 0) + 1:len(line)])
             i = i + 1
 
 

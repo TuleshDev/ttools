@@ -12,17 +12,17 @@ class BaseForCommands(parent):
         index = 0
         for argument1 in commandsArgument1:
             if relPath == argument1:
-                if commands(index).lower() == 'rename':
+                if commands[index].lower() == 'rename':
                     if relPath[len(relPath) - 1:len(relPath)] == '/':
                         if os.path.exists(path):
                             ##line4 = path[:len(path)]
                             ##index2 = line4.rfind('/') + 1
-                            ##dir2_ = line4[:index2] + commandsArgument2(index)
+                            ##dir2_ = line4[:index2] + commandsArgument2[index]
                             ##dir2 = dir2_ + '/'
                             parentPath = os.path.dirname(path)
-                            dir2 = os.path.join(parentPath, commandsArgument2(index))
+                            dir2 = os.path.join(parentPath, commandsArgument2[index])
                             parentRelPath = os.path.dirname(relPath)
-                            line = os.path.join(parentRelPath, commandsArgument2(index))
+                            line = os.path.join(parentRelPath, commandsArgument2[index])
 
                             if not os.path.exists(dir2):
                                 parent.createFolder(dir2)
@@ -33,16 +33,17 @@ class BaseForCommands(parent):
                             parent.jsonForCompare_copy(line, False, dir2, json)
                             parent.jsonForCompare_remove(relPath, False, path, json)
 
+                            parent.clearReadOnlyFolderAttribute(path)
                             shutil.rmtree(path)
                     else:
                         if os.path.exists(path):
                             ##line4 = path
                             ##index2 = line4.rfind('/') + 1
-                            ##path2 = line4[:index2] + commandsArgument2(index)
+                            ##path2 = line4[:index2] + commandsArgument2[index]
                             parentPath = os.path.dirname(path)
-                            path2 = os.path.join(parentPath, commandsArgument2(index))
+                            path2 = os.path.join(parentPath, commandsArgument2[index])
                             parentRelPath = os.path.dirname(relPath)
-                            line = os.path.join(parentRelPath, commandsArgument2(index))
+                            line = os.path.join(parentRelPath, commandsArgument2[index])
 
                             if os.path.exists(path2):
                                 os.remove(path2)
@@ -51,6 +52,7 @@ class BaseForCommands(parent):
                             parent.jsonForCompare_copy(line, True, path2, json)
                             parent.jsonForCompare_remove(relPath, True, path, json)
 
+                            parent.clearReadOnlyFileAttribute(path)
                             os.remove(path)
             index = index + 1
 

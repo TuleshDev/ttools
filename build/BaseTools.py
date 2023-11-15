@@ -99,45 +99,47 @@ class BaseTools:
 
     @staticmethod
     def jsonForCompare_copy(line, isFile, source, json):
-        if isFile:
-            line2 = line.replace(os.sep, '/')
-            if not (line2 in json.data['copy']):
-                json.data['copy'].append(line2)
-        else:
-            with os.scandir(source) as it:
-                for entry in it:
-                    if entry.is_file():
-                        name = os.path.basename(entry.path)
-                        line2 = os.path.join(line, name).replace(os.sep, '/')
-                        if not (line2 in json.data['copy']):
-                            json.data['copy'].append(line2)
+        if json is not None:
+            if isFile:
+                line2 = line.replace(os.sep, '/')
+                if not (line2 in json.data['copy']):
+                    json.data['copy'].append(line2)
+            else:
+                with os.scandir(source) as it:
+                    for entry in it:
+                        if entry.is_file():
+                            name = os.path.basename(entry.path)
+                            line2 = os.path.join(line, name).replace(os.sep, '/')
+                            if not (line2 in json.data['copy']):
+                                json.data['copy'].append(line2)
 
-            with os.scandir(source) as it:
-                for entry in it:
-                    if entry.is_dir():
-                        name = os.path.basename(entry.path)
-                        line2 = os.path.join(line, name)
-                        BaseTools.jsonForCompare_copy(line2, os.path.isfile(entry.path), entry.path, json)
+                with os.scandir(source) as it:
+                    for entry in it:
+                        if entry.is_dir():
+                            name = os.path.basename(entry.path)
+                            line2 = os.path.join(line, name)
+                            BaseTools.jsonForCompare_copy(line2, os.path.isfile(entry.path), entry.path, json)
 
 
     @staticmethod
     def jsonForCompare_remove(line, isFile, source, json):
-        if isFile:
-            line2 = line.replace(os.sep, '/')
-            if line2 in json.data['copy']:
-                json.data['copy'].remove(line2)
-        else:
-            with os.scandir(source) as it:
-                for entry in it:
-                    if entry.is_file():
-                        name = os.path.basename(entry.path)
-                        line2 = os.path.join(line, name).replace(os.sep, '/')
-                        if line2 in json.data['copy']:
-                            json.data['copy'].remove(line2)
+        if json is not None:
+            if isFile:
+                line2 = line.replace(os.sep, '/')
+                if line2 in json.data['copy']:
+                    json.data['copy'].remove(line2)
+            else:
+                with os.scandir(source) as it:
+                    for entry in it:
+                        if entry.is_file():
+                            name = os.path.basename(entry.path)
+                            line2 = os.path.join(line, name).replace(os.sep, '/')
+                            if line2 in json.data['copy']:
+                                json.data['copy'].remove(line2)
 
-            with os.scandir(source) as it:
-                for entry in it:
-                    if entry.is_dir():
-                        name = os.path.basename(entry.path)
-                        line2 = os.path.join(line, name)
-                        BaseTools.jsonForCompare_remove(line2, os.path.isfile(entry.path), entry.path, json)
+                with os.scandir(source) as it:
+                    for entry in it:
+                        if entry.is_dir():
+                            name = os.path.basename(entry.path)
+                            line2 = os.path.join(line, name)
+                            BaseTools.jsonForCompare_remove(line2, os.path.isfile(entry.path), entry.path, json)
