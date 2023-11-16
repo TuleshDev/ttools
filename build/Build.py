@@ -14,7 +14,8 @@ class Build(BaseBuild):
     def run(self, mode=BuildMode.build, remove=None):
         self.isConfigFound = False
         self.checkVersion = False
-        self.isVersionFound = False
+        if self.version != '' and self.version is not None:
+            self.checkVersion = True
         error = self.__checkFolder(mode, self.sourceDir, remove)
         return error
 
@@ -26,26 +27,20 @@ class Build(BaseBuild):
 
     def __checkFolder(self, mode, dir, remove):
         if mode == BuildMode.build or mode == BuildMode.jsonForCompare:
-            error = self.__folder_build(mode, dir, remove)
+            error = self.__folder_build(mode, dir, True, remove)
             return error
 
         if mode == BuildMode.forProject_copy:
-            error = self.__folder_forProject_copy(mode, dir, remove)
+            error = self.__folder_forProject_copy(mode, dir, True, remove)
             return error
 
         return 0
 
 
-    def __folder_build(self, mode, dir, remove):
+    def __folder_build(self, mode, dir, topDir, remove):
         error = 0
-        isVersionFoundForParent = False
 
-        dirName = os.path.basename(dir)
-        if self.checkVersion and dirName == self.version:
-            self.isVersionFound = True
-            isVersionFoundForParent = True
-
-        if not self.checkVersion or self.isVersionFound:
+        if not self.checkVersion or not topDir:
             items = sorted(filter(lambda x: os.path.isfile(os.path.join(dir, x)), os.listdir(dir)), key=lambda x: x.lower())
             for item in items:
                 file = os.path.join(dir, item)
@@ -57,27 +52,29 @@ class Build(BaseBuild):
             items = sorted(filter(lambda x: os.path.isdir(os.path.join(dir, x)), os.listdir(dir)), key=lambda x: x.lower())
             for item in items:
                 folder = os.path.join(dir, item)
-                error = self.__folder_build(mode, folder, remove)
+                if topDir and self.checkVersion:
+                    folderName = os.path.basename(folder)
+                    if folderName != self.version:
+                        continue
+                error = self.__folder_build(mode, folder, False, remove)
                 if error != 0:
                     break
 
         self.isConfigFound = False
-        if self.checkVersion and isVersionFoundForParent:
-            self.isVersionFound = False
 
         return error
 
 
-    def __folder_forProject_copy(self, mode, dir, remove):
+    def __folder_forProject_copy(self, mode, dir, topDir, remove):
         error = 0
-        isVersionFoundForParent = False
 
-        dirName = os.path.basename(dir)
-        if self.checkVersion and dirName == self.version:
-            self.isVersionFound = True
-            isVersionFoundForParent = True
+        if topDir:
+            dirName = os.path.basename(dir)
+            if self.checkVersion:
+                if dirName != self.version:
+                    return error
 
-        if not self.checkVersion or self.isVersionFound:
+        if not self.checkVersion or not topDir:
             items = sorted(filter(lambda x: os.path.isfile(os.path.join(dir, x)), os.listdir(dir)), key=lambda x: x.lower())
             for item in items:
                 file = os.path.join(dir, item)
@@ -98,12 +95,14 @@ class Build(BaseBuild):
             items = sorted(filter(lambda x: os.path.isdir(os.path.join(dir, x)), os.listdir(dir)), key=lambda x: x.lower())
             for item in items:
                 folder = os.path.join(dir, item)
-                error = self.__folder_forProject_copy(mode, folder, remove)
+                if topDir and self.checkVersion:
+                    folderName = os.path.basename(folder)
+                    if folderName != self.version:
+                        continue
+                error = self.__folder_forProject_copy(mode, folder, False, remove)
                 if error != 0:
                     break
 
         self.isConfigFound = False
-        if self.checkVersion and isVersionFoundForParent:
-            self.isVersionFound = False
 
         return error
