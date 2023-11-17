@@ -86,8 +86,8 @@ class ForProject(parent):
                     line6 = line3[:index]
                     line7 = line3[index + 1:len(line3)]
 
-                    index = line.find('{scriptName}', 0)
-                    if index != -1:
+                    index2 = line.find('{scriptName}', 0)
+                    if index2 != -1:
                         line7 = line7.replace('{scriptName}', scriptName, 1)
 
                     if index == -1 or (index != -1 and line5 != line7):
