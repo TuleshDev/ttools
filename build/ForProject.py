@@ -42,32 +42,46 @@ class ForProject(parent):
         if 'copy' in config.data:
             for line in config.data['copy']:
                 if not parent.shouldItemBeRemoved(line, remove):
-                    index = line.rfind('/')
-                    line2 = line[:index]
-                    line3 = line[index + 1:len(line)]
+                    index = line.find(' ', 0)
+                    if index != -1:
+                        line2 = line[:index]
+                        line3 = line[index + 1:len(line)]
+                    else:
+                        line2 = line
+                        line3 = ''
 
-                    if line2 != '.':
-                        sourceDir2 = os.path.join(sourceDir, line2)
-                        destDir2 = os.path.join(destDir, line2)
+                    index2 = line2.rfind('/')
+                    line4 = line2[:index2]
+                    line5 = line2[index2 + 1:len(line2)]
+
+                    if index != -1:
+                        index2 = line3.rfind('/')
+                        line6 = line3[:index2]
+                        line7 = line3[index2 + 1:len(line3)]
+                    else:
+                        line6 = line4
+                        line7 = line5
+
+                    if line4 != '.':
+                        sourceDir2 = os.path.join(sourceDir, line4)
                     else:
                         sourceDir2 = sourceDir
+
+                    if line6 != '.':
+                        destDir2 = os.path.join(destDir, line6)
+                    else:
                         destDir2 = destDir
 
                     if not os.path.exists(destDir2):
                         parent.createFolder(destDir2)
 
-                    if line3 != '':
-                        sourcePath2 = os.path.join(sourceDir2, line3)
-                        destPath2 = os.path.join(destDir2, line3)
+                    if line5 != '' and line7 != '':
+                        sourcePath2 = os.path.join(sourceDir2, line5)
+                        destPath2 = os.path.join(destDir2, line7)
                         if os.path.exists(destPath2):
                             os.remove(destPath2)
                         parent.copy2(sourcePath2, destPath2)
                     else:
-                        if line2 != '.':
-                            destDir2 = os.path.join(destDir, line2)
-                        else:
-                            destDir2 = destDir
-
                         parent.copy2(sourceDir2, destDir2)
 
 
