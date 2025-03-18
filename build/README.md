@@ -35,3 +35,16 @@ Here are some scenarios where this project might be useful:
 - there are codes of the own project under development, but it is divided into folders according to some principle convenient for the developer. For example, these could be folders like: a folder with main codes common to this and another project, a folder with codes specific to this project, a folder with additional modules or plugins that should appear in the *destination folder* or, on the contrary, should not be there, depending on the needs of the developer or user of the project, a folder with codes intended for the configuration of the project, a folder with documentation. If the developer frequently rebuilds and tests the project, and the plugins and documentation take up a lot of disk space or significantly increase the *build script's* runtime, then the developer may temporarily not include the already debugged plugins and ready documentation in the *build result* in the *destination folder*. At the same time, all plugins and documentation will be included in the final *build result* intended for production.
 
 These are only some of the possible use cases of this project.
+
+## Folder structure
+
+The structure of folders and their names in the *source folder* can be arbitrary, for example:
+
+```console
+Origin/
+Changes/
+Plugins/
+Docs/
+```
+
+In this case, the `Origin` folder may contain a copy of the project from GitHub, the `Changes` folder may contain files and folders with codes that modify the original project, the `Plugins` folder may contain codes that change the functionality of plugins from the `Origin` folder, or codes for new plugins, and the `Docs` folder may contain documentation.
