@@ -48,3 +48,18 @@ Docs/
 ```
 
 In this case, the `Origin` folder may contain a copy of the project from GitHub, the `Changes` folder may contain files and folders with codes that modify the original project, the `Plugins` folder may contain codes that change the functionality of plugins from the `Origin` folder, or codes for new plugins, and the `Docs` folder may contain documentation.
+
+## Building order
+
+It matters in what order the files and folders from the project folders are copied, since different projects may have files with the same names and a copy of a file from one project will overlap a copy from another project. The copy order will be determined by the names of the project folders and the natural alphabetical ordering of these names.
+
+The user is given the opportunity to name project folders as he wishes. But it is important to remember that before copying, folders are sorted in alphabetical order.
+
+The folder names above can be changed as follows so that their contents are copied in the order they are listed above:
+
+```console
+1_Origin/
+2_Changes/
+3_Plugins/
+4_Docs/
+```
