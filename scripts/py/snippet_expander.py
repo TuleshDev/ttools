@@ -3,7 +3,7 @@ import subprocess
 from pathlib import Path
 
 regex = re.compile(
-    r'<!--\s*snippet:([0-9a-f]+):([^:#\s]+)(?::([a-zA-Z0-9_-]+))?(?:#L(\d+)-L(\d+))?\s*-->([\s\S]*?)<!--\s*snippet:end\s*-->',
+    r'<!--\s*snippet:([0-9a-f]+):([^:#]+)(?::([a-zA-Z0-9_-]+))?(?:#L(\d+)-L(\d+))?\s*-->([\s\S]*?)<!--\s*snippet:end\s*-->',
     re.IGNORECASE
 )
 

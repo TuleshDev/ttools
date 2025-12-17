@@ -3,7 +3,7 @@ import path from 'path';
 import { execSync } from 'child_process';
 
 const regex =
-  /<!--\s*snippet:([0-9a-f]+):([^:#\s]+)(?::([a-zA-Z0-9_-]+))?(?:#L(\d+)-L(\d+))?\s*-->([\s\S]*?)<!--\s*snippet:end\s*-->/gi;
+  /<!--\s*snippet:([0-9a-f]+):([^:#]+)(?::([a-zA-Z0-9_-]+))?(?:#L(\d+)-L(\d+))?\s*-->([\s\S]*?)<!--\s*snippet:end\s*-->/gi;
 
 function getLanguage(file) {
   const ext = path.extname(file).toLowerCase();
@@ -94,7 +94,7 @@ export function expandSnippets(pathDir = '.', blanksDir = null, addLineNumbers =
     let readme = fs.readFileSync(templateFile, 'utf-8');
 
     const updatedReadme = readme.replace(regex, (match, commit, pathFile, langOverride, start, end) => {
-      const content = execSync(`git show ${commit}:${pathFile}`, { encoding: 'utf-8' });
+      const content = execSync(`git show ${commit}:"${pathFile}"`, { encoding: 'utf-8' });
       const lines = content.split('\n');
 
       let snippetLines;
