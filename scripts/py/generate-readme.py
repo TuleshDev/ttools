@@ -1,4 +1,5 @@
 import sys
+sys.pycache_prefix='C:/__pycache__'
 from snippet_expander import expand_snippets
 
 if __name__ == "__main__":
