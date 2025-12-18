@@ -63,3 +63,123 @@ The folder names above can be changed as follows so that their contents are copi
 3_Plugins/
 4_Docs/
 ```
+
+## How does this work?
+
+As mentioned at the beginning, this project contains a set of Python classes that can be used to build a script that does the copying. In the future, we will call it a **build script**. The script can have any name, for the sake of clarity, let's call it `build.py`. An example of this script is contained in this folder (`build`) of the repository. It's called `"build (Example).py"`. Here are its contents:
+
+<!-- snippet:1424691a:build/build (Example).py:python -->
+> [From commit `1424691a`, file `build/build (Example).py`](https://github.com/TuleshDev/ttools/blob/1424691a/build/build (Example).py)
+
+```python
+1	import sys
+2	sys.path.append('./0_Build/ttools/build')
+3	sys.pycache_prefix='C:/__pycache__'
+4	
+5	from BuildHelper import BuildHelper
+6	
+7	
+8	def main():
+9	    isBuildIncluded = True
+10	
+11	    buildHelper = BuildHelper(__file__, isBuildIncluded)
+12	    error = buildHelper.run()
+13	    return error
+14	
+15	
+16	if __name__ == '__main__':
+17	    main()
+```
+<!-- snippet:end -->
+
+We will call the folder where the `build.py` script is located the **build folder**. This folder can be any folder. The *build folder* can be the same as the *source folder* if the `build.py` script is located in the *source folder*.
+
+In the `build.py` script, the `run()` method of the object of the `BuildHelper` class is called. This class, as well as its parent class `BasePaths`, are helper classes and are closely related to the *build result* and therefore should be written individually for the needs of the *build result* and located in the *build folder*. The `BuildHelper` class defines how the `ttools/build` tool classes will be used during the copy process, and the `BasePaths` class is for customizing the paths used. The `BasePaths` and `BuildHelper` classes rely on a set of classes defined in the `ttools/build` folder. This folder contains the files `"BasePaths (Example).py"` and `"BuildHelper (Example).py"`, which define examples of the `BasePaths` and `BuildHelper` classes, respectively.
+
+This is what the `"BasePaths (Example).py"` file looks like:
+
+<!-- snippet:1424691a:build/BasePaths (Example).py:python -->
+> [From commit `1424691a`, file `build/BasePaths (Example).py`](https://github.com/TuleshDev/ttools/blob/1424691a/build/BasePaths (Example).py)
+
+```python
+1	import os.path
+2	
+3	from BaseTools import BaseTools
+4	
+5	
+6	class BasePaths:
+7	
+8	    def __init__(self, file):
+9	        self.rootDir = os.path.dirname(file)
+10	        rootDirName = os.path.basename(self.rootDir)
+11	
+12	        sourceFragment = ''
+13	        path = os.path.join(self.rootDir, 'source.txt')
+14	        if os.path.exists(path):
+15	            with open(path, 'r') as read_file:
+16	                sourceFragment = read_file.readline().replace('\n', '')
+17	
+18	        if sourceFragment == '':
+19	            self.sourceDir = os.path.join(self.rootDir, 'sourceDir')
+20	        else:
+21	            self.sourceDir = BaseTools.buildPath(self.rootDir, sourceFragment)
+22	
+23	        destFragment = ''
+24	        path = os.path.join(self.rootDir, 'destination.txt')
+25	        if os.path.exists(path):
+26	            with open(path, 'r') as read_file:
+27	                destFragment = read_file.readline().replace('\n', '')
+28	
+29	        if destFragment == '':
+30	            self.destDir = os.path.join(self.rootDir, 'destDir')
+31	        else:
+32	            destFragment = BaseTools.buildPath(self.rootDir, destFragment)
+33	            self.destDir = destFragment
+34	
+35	        self.version = ''
+36	
+37	        self.scriptName = os.path.basename(file)
+38	        position = self.scriptName.rfind('.py')
+39	        if position != -1:
+40	            self.scriptName = self.scriptName[:position]
+41	
+42	        self.scriptDescriptor1 = rootDirName + '.' + self.scriptName
+43	        self.scriptDescriptor2 = self.scriptDescriptor1
+```
+<!-- snippet:end -->
+
+In the definition of the `BasePaths` class from this file, the values ​​written in the `source.txt`, `destination.txt`, `version.txt` files, which must be located in the root of the *build folder*, are read. These values ​​allow you to define class attributes for the *source folder*, *destination folder*, and version number of the *build result*. The class also defines several additional attributes, including `scriptName`, `scriptDescriptor1`, and `scriptDescriptor2`.
+
+In some cases, the version of the *build result* is an important parameter, and in this case, it must be somehow used in forming the `self.destDir` attribute of the `BasePaths` class for the *destination folder*, in order to take into account where to copy depending on the version number. This can be done, for example, like this:
+
+```python
+class BasePaths:
+
+    def __init__(self, file):
+        self.rootDir = os.path.dirname(file)
+        rootDirName = os.path.basename(self.rootDir)
+
+        ...
+
+        destFragment = ''
+        path = os.path.join(self.rootDir, 'destination.txt')
+        if os.path.exists(path):
+            with open(path, 'r') as read_file:
+                destFragment = read_file.readline().replace('\n', '')
+
+        if destFragment == '':
+            self.destDir = os.path.join(self.rootDir, 'destDir')
+        else:
+            destFragment = BaseTools.buildPath(self.rootDir, destFragment)
+            self.destDir = os.path.join(destFragment, rootDirName)
+
+        path = os.path.join(self.rootDir, 'version.txt')
+        if os.path.exists(path):
+            with open(path, 'r') as read_file2:
+                self.version = read_file2.readline().replace('\n', '')
+                self.destDir = os.path.join(self.destDir, self.version)
+        else:
+            self.version = '1'
+```
+
+If the version number is not important for the *build result*, you can use the example from the file `"BasePaths (Example).py"` as a basis for the `BasePaths` class.
