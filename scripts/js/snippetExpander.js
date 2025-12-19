@@ -2,8 +2,8 @@ import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
 
-const regex =
-  /<!--\s*snippet:([0-9a-f]+):([^:#]+)(?::([a-zA-Z0-9_-]+))?(?:#L(\d+)-L(\d+))?\s*-->([\s\S]*?)<!--\s*snippet:end\s*-->/gi;
+const regexGit = /<!--\s*snippet:([0-9a-f]+):([^:#]+)(?::([a-zA-Z0-9_-]+))?(?:#L(\d+)-L(\d+))?\s*-->([\s\S]*?)<!--\s*snippet:end\s*-->/gi;
+const regexInline = /<!--\s*snippet:([a-zA-Z0-9_-]+)\s*-->([\s\S]*?)<!--\s*snippet:end\s*-->/gi;
 
 function getLanguage(file) {
   const ext = path.extname(file).toLowerCase();
@@ -20,6 +20,11 @@ function getLanguage(file) {
     case '.sh': return 'bash';
     default: return '';
   }
+}
+
+function numberCode(code, start = 1) {
+  const lines = code.trimEnd().split('\n');
+  return lines.map((line, i) => `${i + start}\t${line}`).join('\n');
 }
 
 function getLabelLang(fileName) {
@@ -91,9 +96,9 @@ export function expandSnippets(pathDir = '.', blanksDir = null, addLineNumbers =
     const targetFile = path.join(absPath, file);
     const labelLang = getLabelLang(file);
 
-    let readme = fs.readFileSync(templateFile, 'utf-8');
+    let text = fs.readFileSync(templateFile, 'utf-8');
 
-    const updatedReadme = readme.replace(regex, (match, commit, pathFile, langOverride, start, end) => {
+    text = text.replace(regexGit, (match, commit, pathFile, langOverride, start, end) => {
       const content = execSync(`git show ${commit}:"${pathFile}"`, { encoding: 'utf-8' });
       const lines = content.split('\n');
 
@@ -102,24 +107,27 @@ export function expandSnippets(pathDir = '.', blanksDir = null, addLineNumbers =
       if (start && end) {
         const s = Number(start), e = Number(end);
         snippetLines = lines.slice(s - 1, e);
-        numbered = addLineNumbers
-          ? snippetLines.map((line, i) => `${i + s}\t${line}`)
-          : snippetLines;
+        numbered = addLineNumbers ? numberCode(snippetLines.join('\n'), s) : snippetLines.join('\n');
       } else {
-        snippetLines = lines;
-        numbered = addLineNumbers
-          ? snippetLines.map((line, i) => `${i + 1}\t${line}`)
-          : snippetLines;
+        numbered = addLineNumbers ? numberCode(lines.join('\n')) : lines.join('\n');
       }
 
       const lang = langOverride || getLanguage(pathFile);
       const label = makeLabel(commit, pathFile, start, end, labelLang, remoteUrl);
-      const snippet = `\`\`\`${lang}\n${numbered.join('\n')}\n\`\`\``;
+      const snippet = `\`\`\`${lang}\n${numbered}\n\`\`\``;
 
-      return `<!-- snippet:${commit}:${pathFile}${langOverride ? `:${langOverride}` : ''}${start && end ? `#L${start}-L${end}` : ''} -->\n${label}\n\n${snippet}\n<!-- snippet:end -->`;
+      // return `<!-- snippet:${commit}:${pathFile}${langOverride ? `:${langOverride}` : ''}${start && end ? `#L${start}-L${end}` : ''} -->\n${label}\n\n${snippet}\n<!-- snippet:end -->`;
+      return `${label}\n\n${snippet}\n`;
     });
 
-    fs.writeFileSync(targetFile, updatedReadme);
+    text = text.replace(regexInline, (match, lang, code) => {
+      const numbered = addLineNumbers ? numberCode(code) : code.trimEnd();
+      const snippet = `\`\`\`${lang}\n${numbered}\n\`\`\``;
+      // return `<!-- snippet:${lang} -->\n${snippet}\n<!-- snippet:end -->`;
+      return `${snippet}\n`;
+    });
+
+    fs.writeFileSync(targetFile, text);
     console.log(`Updated: ${targetFile}`);
   });
 }
