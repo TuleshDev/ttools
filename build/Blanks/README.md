@@ -86,7 +86,7 @@ In the definition of the `BasePaths` class from this file, the values ​​writ
 
 In some cases, the version of the *build result* is an important parameter, and in this case, it must be somehow used in forming the `self.destDir` attribute of the `BasePaths` class for the *destination folder*, in order to take into account where to copy depending on the version number. This can be done, for example, like this:
 
-```python
+<!-- snippet:python -->
 class BasePaths:
 
     def __init__(self, file):
@@ -114,6 +114,6 @@ class BasePaths:
                 self.destDir = os.path.join(self.destDir, self.version)
         else:
             self.version = '1'
-```
+<!-- snippet:end -->
 
 If the version number is not important for the *build result*, you can use the example from the file `"BasePaths (Example).py"` as a basis for the `BasePaths` class.
