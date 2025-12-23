@@ -68,7 +68,6 @@ The folder names above can be changed as follows so that their contents are copi
 
 As mentioned at the beginning, this project contains a set of Python classes that can be used to build a script that does the copying. In the future, we will call it a **build script**. The script can have any name, for the sake of clarity, let's call it `build.py`. An example of this script is contained in this folder (`build`) of the repository. It's called `"build (Example).py"`. Here are its contents:
 
-<!-- snippet:1424691a:build/build (Example).py:python -->
 > [From commit `1424691a`, file `build/build (Example).py`](https://github.com/TuleshDev/ttools/blob/1424691a/build/build (Example).py)
 
 ```python
@@ -90,7 +89,7 @@ As mentioned at the beginning, this project contains a set of Python classes tha
 16	if __name__ == '__main__':
 17	    main()
 ```
-<!-- snippet:end -->
+
 
 We will call the folder where the `build.py` script is located the **build folder**. This folder can be any folder. The *build folder* can be the same as the *source folder* if the `build.py` script is located in the *source folder*.
 
@@ -98,7 +97,6 @@ In the `build.py` script, the `run()` method of the object of the `BuildHelper` 
 
 This is what the `"BasePaths (Example).py"` file looks like:
 
-<!-- snippet:1424691a:build/BasePaths (Example).py:python -->
 > [From commit `1424691a`, file `build/BasePaths (Example).py`](https://github.com/TuleshDev/ttools/blob/1424691a/build/BasePaths (Example).py)
 
 ```python
@@ -146,40 +144,41 @@ This is what the `"BasePaths (Example).py"` file looks like:
 42	        self.scriptDescriptor1 = rootDirName + '.' + self.scriptName
 43	        self.scriptDescriptor2 = self.scriptDescriptor1
 ```
-<!-- snippet:end -->
+
 
 In the definition of the `BasePaths` class from this file, the values ​​written in the `source.txt`, `destination.txt`, `version.txt` files, which must be located in the root of the *build folder*, are read. These values ​​allow you to define class attributes for the *source folder*, *destination folder*, and version number of the *build result*. The class also defines several additional attributes, including `scriptName`, `scriptDescriptor1`, and `scriptDescriptor2`.
 
 In some cases, the version of the *build result* is an important parameter, and in this case, it must be somehow used in forming the `self.destDir` attribute of the `BasePaths` class for the *destination folder*, in order to take into account where to copy depending on the version number. This can be done, for example, like this:
 
 ```python
-class BasePaths:
-
-    def __init__(self, file):
-        self.rootDir = os.path.dirname(file)
-        rootDirName = os.path.basename(self.rootDir)
-
-        ...
-
-        destFragment = ''
-        path = os.path.join(self.rootDir, 'destination.txt')
-        if os.path.exists(path):
-            with open(path, 'r') as read_file:
-                destFragment = read_file.readline().replace('\n', '')
-
-        if destFragment == '':
-            self.destDir = os.path.join(self.rootDir, 'destDir')
-        else:
-            destFragment = BaseTools.buildPath(self.rootDir, destFragment)
-            self.destDir = os.path.join(destFragment, rootDirName)
-
-        path = os.path.join(self.rootDir, 'version.txt')
-        if os.path.exists(path):
-            with open(path, 'r') as read_file2:
-                self.version = read_file2.readline().replace('\n', '')
-                self.destDir = os.path.join(self.destDir, self.version)
-        else:
-            self.version = '1'
+1	class BasePaths:
+2	
+3	    def __init__(self, file):
+4	        self.rootDir = os.path.dirname(file)
+5	        rootDirName = os.path.basename(self.rootDir)
+6	
+7	        ...
+8	
+9	        destFragment = ''
+10	        path = os.path.join(self.rootDir, 'destination.txt')
+11	        if os.path.exists(path):
+12	            with open(path, 'r') as read_file:
+13	                destFragment = read_file.readline().replace('\n', '')
+14	
+15	        if destFragment == '':
+16	            self.destDir = os.path.join(self.rootDir, 'destDir')
+17	        else:
+18	            destFragment = BaseTools.buildPath(self.rootDir, destFragment)
+19	            self.destDir = os.path.join(destFragment, rootDirName)
+20	
+21	        path = os.path.join(self.rootDir, 'version.txt')
+22	        if os.path.exists(path):
+23	            with open(path, 'r') as read_file2:
+24	                self.version = read_file2.readline().replace('\n', '')
+25	                self.destDir = os.path.join(self.destDir, self.version)
+26	        else:
+27	            self.version = '1'
 ```
+
 
 If the version number is not important for the *build result*, you can use the example from the file `"BasePaths (Example).py"` as a basis for the `BasePaths` class.

@@ -68,7 +68,6 @@ Docs/
 
 Как упоминалось в начале, этот проект содержит набор классов на Python, из которых можно построить скрипт, выполняющий копирование. В дальнейшем, будем называть его **скриптом построения**. Скрипт может иметь любое имя, для определённости, назовём его `build.py`. Пример этого скрипта содержится в папке `build` репозитория. Он называется `"build (Example).py"`. Вот его содержимое:
 
-<!-- snippet:1424691a:build/build (Example).py:python -->
 > [Из коммита `1424691a`, файл `build/build (Example).py`](https://github.com/TuleshDev/ttools/blob/1424691a/build/build (Example).py)
 
 ```python
@@ -90,7 +89,7 @@ Docs/
 16	if __name__ == '__main__':
 17	    main()
 ```
-<!-- snippet:end -->
+
 
 Папку, в которой находится скрипт `build.py`, назовём **папкой построения**. Этой папкой может быть любая папка. *Папка построения* может совпадать с *папкой источника*, если скрипт `build.py` лежит в *папке источнике*.
 
@@ -98,7 +97,6 @@ Docs/
 
 Вот как выглядит файл `"BasePaths (Example).py"`:
 
-<!-- snippet:1424691a:build/BasePaths (Example).py:python -->
 > [Из коммита `1424691a`, файл `build/BasePaths (Example).py`](https://github.com/TuleshDev/ttools/blob/1424691a/build/BasePaths (Example).py)
 
 ```python
@@ -146,40 +144,41 @@ Docs/
 42	        self.scriptDescriptor1 = rootDirName + '.' + self.scriptName
 43	        self.scriptDescriptor2 = self.scriptDescriptor1
 ```
-<!-- snippet:end -->
+
 
 В определении класса `BasePaths` из этого файла считываются значения, записанные в файлах `source.txt`, `destination.txt`, `version.txt`, которые должны находиться в корне *папки построения*. Эти значения позволяют определить атрибуты класса для *папки источника*, *папки назначения* и номера версии *результата построения*. Также, в классе определяется несколько дополнительных атрибутов, в том числе `scriptName`, `scriptDescriptor1` и `scriptDescriptor2`.
 
 В некоторых случаях версия *результата построения* является важным параметром и в таком случае, её надо как-то использовать в формировании атрибута `self.destDir` класса `BasePaths` для *папки назначения*, чтобы учитывать куда копировать в зависимости от номера версии. Это можно сделать, например, так:
 
 ```python
-class BasePaths:
-
-    def __init__(self, file):
-        self.rootDir = os.path.dirname(file)
-        rootDirName = os.path.basename(self.rootDir)
-
-        ...
-
-        destFragment = ''
-        path = os.path.join(self.rootDir, 'destination.txt')
-        if os.path.exists(path):
-            with open(path, 'r') as read_file:
-                destFragment = read_file.readline().replace('\n', '')
-
-        if destFragment == '':
-            self.destDir = os.path.join(self.rootDir, 'destDir')
-        else:
-            destFragment = BaseTools.buildPath(self.rootDir, destFragment)
-            self.destDir = os.path.join(destFragment, rootDirName)
-
-        path = os.path.join(self.rootDir, 'version.txt')
-        if os.path.exists(path):
-            with open(path, 'r') as read_file2:
-                self.version = read_file2.readline().replace('\n', '')
-                self.destDir = os.path.join(self.destDir, self.version)
-        else:
-            self.version = '1'
+1	class BasePaths:
+2	
+3	    def __init__(self, file):
+4	        self.rootDir = os.path.dirname(file)
+5	        rootDirName = os.path.basename(self.rootDir)
+6	
+7	        ...
+8	
+9	        destFragment = ''
+10	        path = os.path.join(self.rootDir, 'destination.txt')
+11	        if os.path.exists(path):
+12	            with open(path, 'r') as read_file:
+13	                destFragment = read_file.readline().replace('\n', '')
+14	
+15	        if destFragment == '':
+16	            self.destDir = os.path.join(self.rootDir, 'destDir')
+17	        else:
+18	            destFragment = BaseTools.buildPath(self.rootDir, destFragment)
+19	            self.destDir = os.path.join(destFragment, rootDirName)
+20	
+21	        path = os.path.join(self.rootDir, 'version.txt')
+22	        if os.path.exists(path):
+23	            with open(path, 'r') as read_file2:
+24	                self.version = read_file2.readline().replace('\n', '')
+25	                self.destDir = os.path.join(self.destDir, self.version)
+26	        else:
+27	            self.version = '1'
 ```
+
 
 Если же номер версии не важен для *результата построения*, в качестве основы для класса `BasePaths` можно взять пример из файла `"BasePaths (Example).py"`.
